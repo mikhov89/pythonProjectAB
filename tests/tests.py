@@ -1,4 +1,5 @@
 import ast
+import time
 
 import pytest
 import pytest_asyncio
@@ -12,23 +13,23 @@ PHONE_2 = "2128508"
 PHONE_3 = "2128509"
 
 test_data = {"create":
-                 f'{{"id": "1","method": "add","name": "Hurry","surname": "Potter","phone": "{PHONE}","age": 60}}',
+                 f'{{"id": "1","method": "add","name": "Harry","surname": "Potter","phone": "{PHONE}","age": 60}}',
              "create2":
                  f'{{"id": "2","method": "add","name": "Stiven","surname": "Sigal","phone": "{PHONE_2}","age": 65}}',
              "create_same_surname_and_name":
-                 f'{{"id": "2","method": "add","name": "Hurry","surname": "Potter","phone": "{PHONE_3}","age": 20}}',
+                 f'{{"id": "2","method": "add","name": "Harry","surname": "Potter","phone": "{PHONE_3}","age": 20}}',
              "delete": f'{{"method": "delete", "id": "3", "phone": "{PHONE}"}}',
              "update_surname":
                  f'{{"method": "update", "id": "4", "name": "Chuck","surname": "NEW_Dorris","phone": "{PHONE}","age": 60}}',
              "update_name":
                  f'{{"method": "update", "id": "4", "name": "NEW_Chuck","surname": "Dorris","phone": "{PHONE}","age": 60}}',
              "update_age":
-                 f'{{"method": "update", "id": "4", "name": "Chuck","surname": "Dorris","phone": "{PHONE}","age": 65}}',
+                 f'{{"method": "update", "id": "4", "name": "Harry","surname": "Dorris","phone": "{PHONE}","age": 65}}',
              "update_phone":
-                 f'{{"method": "update", "id": "4", "name": "Chuck","surname": "Dorris","phone": "{PHONE_2}","age": 60}}',
-             "select_by_phone": f'{{"id": "5","method": "select","phone": "{PHONE}"}}',
-             "select_by_name": f'{{"id": "5","method": "select","name": "Chuck"}}',
-             "select_by_surname": f'{{"id": "5","method": "select","surname": "Norris"}}',
+                 f'{{"method": "update", "id": "4", "name": "Harry","surname": "Dorris","phone": "{PHONE_2}","age": 60}}',
+             "select_by_phone": f'{{"id": "2000","method": "select","phone": "{PHONE}"}}',
+             "select_by_name": f'{{"id": "2001","method": "select","name": "Harry"}}',
+             "select_by_surname": f'{{"id": "2002","method": "select","surname": "Potter"}}',
              }
 
 
@@ -40,7 +41,7 @@ async def wsf():
 
 
 @pytest_asyncio.fixture(autouse=True)
-async def delete_user(wsf):
+async def clear_users(wsf):
     yield
     await wsf.send(f'{{"method": "delete", "id": "1000", "phone": "{PHONE}"}}')
     await wsf.send(f'{{"method": "delete", "id": "1001", "phone": "{PHONE_2}"}}')
@@ -133,30 +134,31 @@ class TestsWS:
         print(json.loads(repl))
 
     @pytest.mark.asyncio
-    async def test_select_by_name_and_surname(self, wsf):
-        await wsf.send(f'{{"method": "delete", "id": "1000", "phone": "{PHONE}"}}')
-        await wsf.send(f'{{"method": "delete", "id": "1001", "phone": "{PHONE_2}"}}')
-        await wsf.send(f'{{"method": "delete", "id": "1001", "phone": "{PHONE_3}"}}')
+    @pytest.mark.parametrize("select_request",
+                             [test_data["select_by_name"], test_data["select_by_surname"]])
+    async def test_select_by_name_and_surname(self, wsf, clear_users, select_request):
+        clear_users
         await send_and_get_response(wsf, test_data["create"])
         await send_and_get_response(wsf, test_data["create_same_surname_and_name"])
-        repl = await send_and_get_response(wsf,
-                                           test_data["select_by_name"])
-        assert json.loads(repl) == ast.literal_eval(
-            f'{{"id": "5", "method": "select", "status": "failure"}}')
-
-    # async with websockets.connect(uri) as ws:
-    #     await ws.send(
-    #         '{"id": "sfda-11231-123-adfa","method": "add","name": "Chuck","surname": "Dorris","phone": "2128507","age": 100500}')
-    #     repl = await ws.recv()
-    #     print(json.loads(repl))
-    #
-    # async with websockets.connect(uri) as ws:
-    #     await ws.send('{"id": "123412-adf-132111","method": "select","name": "Chuck"}')
-    #     repl = await ws.recv()
-    #     print(json.loads(repl))
-    #
-    # async with websockets.connect(uri) as ws:
-    #     await ws.send(
-    #         '{"id": "sfda-11231-123-adfa","method": "add","name": "Chuck","surname": "Dorris","phone": "2128507","age": 100500}')
-    #     repl = await ws.recv()
-    #     print(json.loads(repl))
+        reply = await send_and_get_response(wsf,
+                                            select_request)
+        assert json.loads(reply) == ast.literal_eval(
+            f'{{\
+               "id": "2001",\
+               "method": "select",\
+               "status": "success",\
+               "users": [\
+                  {{\
+                     "age": 60,\
+                     "name": "Harry",\
+                     "phone": "2128507",\
+                     "surname": "Potter"\
+                  }},\
+                  {{\
+                     "age": 20,\
+                     "name": "Harry",\
+                     "phone": "2128509",\
+                     "surname": "Potter"\
+                  }}\
+               ]\
+              }}')
