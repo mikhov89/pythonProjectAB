@@ -25,6 +25,8 @@ test_data = {"create":
                  f'{{"id": "2","method": "add","name": "Harry","surname": "Potter","age": 20}}',
              "create_wrong_req_id":
                  f'{{"id": "!jkfsgjfldsdfldajk$#","method": "add","name": "Harry","surname": "Potter","phone": "89999999999","age": 20}}',
+             "create_same_req_id":
+                 f'{{"id": "11111","method": "add","name": "Harry","surname": "DELETE FROM users WHERE name=\'Harry\';","phone": "Random","age": 30}}',
              "delete": f'{{"method": "delete", "id": "3", "phone": "{PHONE}"}}',
              "delete_no_phone": f'{{"method": "delete", "id": "3"}}',
              "update_surname":
@@ -57,6 +59,7 @@ async def clear_users(wsf):
     await wsf.send(f'{{"method": "delete", "id": "1001", "phone": "{PHONE_2}"}}')
     await wsf.send(f'{{"method": "delete", "id": "1002", "phone": "{PHONE_3}"}}')
     await wsf.send(f'{{"method": "delete", "id": "1003", "phone": "89999999999"}}')
+    await wsf.send(f'{{"method": "delete", "id": "1003", "phone": "Random"}}')
 
 
 async def send_and_get_response(ws, request):
