@@ -13,7 +13,6 @@ class Tests_add_user:
         create_response = await send_and_get_response(wsf, test_data['create'])
         assert json.loads(create_response) == ast.literal_eval(
             f'{{"id": "1", "method": "add", "status": "success"}}')
-        print(json.loads(create_response))
         await check_changes(test_data['create'], wsf)
 
     # создание существующего юзера, ждем failure
@@ -23,7 +22,6 @@ class Tests_add_user:
         create_response_dupl = await send_and_get_response(wsf, test_data['create'])
         assert json.loads(create_response_dupl) == ast.literal_eval(
             f'{{"id": "1", "method": "add", "status": "failure"}}')
-        print(json.loads(create_response_dupl))
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize("create_request",

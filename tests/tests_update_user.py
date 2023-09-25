@@ -29,10 +29,8 @@ class Tests_update_user:
                                            f'{{"method": "update", "id": "11", "name": "Chuck","surname": "Dorris","phone": "222222","age": 100500}}')
         assert json.loads(repl) == ast.literal_eval(
             f'{{"id": "11", "method": "update", "status": "failure"}}')
-        print(json.loads(repl))
 
     @pytest.mark.asyncio
     async def test_update_with_no_phone(self, wsf, clear_users):
         update_result = await send_and_get_response(wsf, test_data["update_no_phone"])
-        print(update_result)
         assert "[json.exception.out_of_range.403] key " in str(json.loads(update_result))

@@ -15,7 +15,6 @@ class Tests_delete_user:
         delete_response = await send_and_get_response(wsf, test_data['delete'])
         assert json.loads(delete_response) == ast.literal_eval(
             f'{{"id": "3", "method": "delete", "status": "success"}}')
-        print(json.loads(delete_response))
 
     # удаление НЕсуществующего юзера, ждем failure
     @pytest.mark.asyncio
@@ -23,10 +22,8 @@ class Tests_delete_user:
         delete_response = await send_and_get_response(wsf, test_data['delete'])
         assert json.loads(delete_response) == ast.literal_eval(
             f'{{"id": "3", "method": "delete", "status": "failure"}}')
-        print(json.loads(delete_response))
 
     @pytest.mark.asyncio
     async def test_delete_with_no_phone(self, wsf):
         delete_result = await send_and_get_response(wsf, test_data["delete_no_phone"])
-        print(delete_result)
         assert "[json.exception.out_of_range.403] key 'phone' not found" in str(json.loads(delete_result))
