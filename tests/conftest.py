@@ -27,6 +27,8 @@ test_data = {"create":
                  f'{{"id": "!jkfsgjfldsdfldajk$#","method": "add","name": "Harry","surname": "Potter","phone": "89999999999","age": 20}}',
              "create_same_req_id":
                  f'{{"id": "11111","method": "add","name": "Harry","surname": "DELETE FROM users WHERE name=\'Harry\';","phone": "Random","age": 30}}',
+             "create_not_valid_data":
+                 f'{{"id": "111111","method": "add","name": "4673268","surname": "DELETE FROM users WHERE name=\'Harry\';","phone": "Random","age": 64382648328}}',
              "delete": f'{{"method": "delete", "id": "3", "phone": "{PHONE}"}}',
              "delete_no_phone": f'{{"method": "delete", "id": "3"}}',
              "update_surname":

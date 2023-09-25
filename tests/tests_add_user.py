@@ -35,3 +35,12 @@ class Tests_add_user:
         select_result = await send_and_get_response(wsf,
                                                     f'{{"id": "2000","method": "select","phone": "89999999999"}}')
         assert (json.loads(select_result)) == {'id': '2000', 'method': 'select', 'status': 'failure'}
+
+
+    # создание нового юзера c невалидными данными, ждем failure
+    @pytest.mark.asyncio
+    async def test_add_invalid(self, wsf, clear_users):
+        create_response = await send_and_get_response(wsf, test_data['create_not_valid_data'])
+        assert json.loads(create_response) == ast.literal_eval(
+            f'{{"id": "1", "method": "add", "status": "failure"}}')
+        await check_changes(test_data['create_not_valid_data'], wsf)
