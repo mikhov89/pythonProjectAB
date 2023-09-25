@@ -43,7 +43,7 @@ class TestsWS:
                                             test_data["select_by_phone"])
         assert json.loads(reply) == ast.literal_eval(
             f'{{\
-               "id": "2001",\
+               "id": "2000",\
                "method": "select",\
                "status": "success",\
                "users": [\
@@ -51,12 +51,6 @@ class TestsWS:
                      "age": 60,\
                      "name": "Harry",\
                      "phone": "2128507",\
-                     "surname": "Potter"\
-                  }},\
-                  {{\
-                     "age": 20,\
-                     "name": "Harry",\
-                     "phone": "2128509",\
                      "surname": "Potter"\
                   }}\
                ]\
